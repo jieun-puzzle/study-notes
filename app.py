@@ -26,7 +26,8 @@ st.set_page_config(
 
 
 @st.cache_data
-def load_data():
+def load_data(_mtime: float):
+    # _mtime(파일 수정 시각)이 바뀌면 캐시가 자동 무효화되어 최신 데이터를 읽는다.
     return json.loads(DATA_PATH.read_text(encoding="utf-8"))
 
 
@@ -66,7 +67,7 @@ def question_card(item, show_answer: bool):
 
 
 # ---------------------------------------------------------------- 데이터 로드
-data = load_data()
+data = load_data(DATA_PATH.stat().st_mtime)
 companies = sorted({d["company"] for d in data})
 
 st.caption(f"총 {len(data)}개 항목 · {' / '.join(companies)}")
