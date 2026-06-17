@@ -161,10 +161,6 @@ if mode == "📚 회사별 정리":
             if k in d["question"].lower() or k in d["answer"].lower()
         ]
 
-    # 내가 작성한 답변 저장소 (질문 id -> 텍스트)
-    if "my_answers" not in st.session_state:
-        st.session_state.my_answers = {}
-
     st.caption(f"{len(filtered)}개 질문")
     st.divider()
 
@@ -196,17 +192,14 @@ if mode == "📚 회사별 정리":
         # --- 오른쪽: 내 답변 작성 ---
         with right:
             st.markdown("**✍️ 내 답변**")
-            draft = st.text_area(
+            # text_area의 key가 입력 내용을 세션 동안 자동 유지 (저장 버튼 불필요)
+            st.text_area(
                 "내 답변 작성",
-                value=st.session_state.my_answers.get(str(qid), ""),
                 key=f"draft_{qid}",
                 height=160,
                 label_visibility="collapsed",
                 placeholder="여기에 내 답변을 작성해보세요…",
             )
-            if st.button("💾 저장하기", key=f"save_{qid}"):
-                st.session_state.my_answers[str(qid)] = draft
-                st.success("저장되었습니다.")
 
             # --- 음성 녹음 (실전 연습) ---
             if "my_recordings" not in st.session_state:
