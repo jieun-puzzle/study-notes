@@ -134,6 +134,23 @@ companies = sorted({d["company"] for d in data})
 
 st.caption(f"총 {len(data)}개 항목 · {' / '.join(companies)}")
 
+# ---------------------------------------------------------------- 회사 정보 섹션
+COMPANY_PATH = Path(__file__).resolve().parent / "company_info.json"
+if COMPANY_PATH.exists():
+    company = json.loads(COMPANY_PATH.read_text(encoding="utf-8"))
+    with st.expander(f"🏢 {company.get('name', '회사 정보')}", expanded=False):
+        for f in company.get("fields", []):
+            val = f["value"]
+            if str(val).startswith("http"):
+                val = f"[{val}]({val})"
+            st.markdown(f"**{f['label']}** · {val}")
+        if company.get("intro_title"):
+            st.markdown(f"#### {company['intro_title']}")
+            st.markdown(company.get("intro", ""))
+        if company.get("vision_title"):
+            st.markdown(f"#### {company['vision_title']}")
+            st.markdown(company.get("vision", ""))
+
 mode = st.radio(
     "모드 선택",
     ["📚 회사별 정리", "🧠 암기 모드", "🎲 랜덤 연습"],
