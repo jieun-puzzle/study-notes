@@ -17,6 +17,12 @@ from pathlib import Path
 
 import streamlit as st
 
+try:
+    from streamlit_mic_recorder import mic_recorder
+    _MIC_AVAILABLE = True
+except ImportError:  # 라이브러리 미설치 환경에서도 앱이 죽지 않도록
+    _MIC_AVAILABLE = False
+
 DATA_PATH = Path(__file__).resolve().parent / "questions.json"
 
 st.set_page_config(
@@ -193,6 +199,33 @@ if mode == "📚 회사별 정리":
             if st.button("💾 저장하기", key=f"save_{qid}"):
                 st.session_state.my_answers[str(qid)] = draft
                 st.success("저장되었습니다.")
+
+            # --- 음성 녹음 (실전 연습) ---
+            if "my_recordings" not in st.session_state:
+                st.session_state.my_recordings = {}
+
+            st.markdown("**🎙️ 실전 연습 녹음**")
+            if _MIC_AVAILABLE:
+                rec = mic_recorder(
+                    start_prompt="🎤 실전 연습 녹음 시작",
+                    stop_prompt="⏹️ 녹음 중지",
+                    just_once=False,
+                    use_container_width=True,
+                    format="webm",
+                    key=f"mic_{qid}",
+                )
+                # 새 녹음이 들어오면 질문 id별로 저장
+                if rec and rec.get("bytes"):
+                    st.session_state.my_recordings[str(qid)] = rec["bytes"]
+
+                saved_audio = st.session_state.my_recordings.get(str(qid))
+                if saved_audio:
+                    st.audio(saved_audio, format="audio/webm")
+                    if st.button("🗑️ 녹음 삭제", key=f"delrec_{qid}"):
+                        st.session_state.my_recordings.pop(str(qid), None)
+                        st.rerun()
+            else:
+                st.caption("⚠️ 녹음 기능을 쓰려면 streamlit-mic-recorder 설치가 필요합니다.")
 
         st.divider()
 
