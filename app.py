@@ -100,17 +100,18 @@ def company_badge(company: str) -> str:
     )
 
 
-def question_card(item, show_answer: bool):
-    """질문 1개 표시. show_answer=False면 답변을 접어둔다."""
+def question_card(item, show_answer: bool, number=None):
+    """질문 1개 표시. show_answer=False면 답변을 접어둔다. number가 있으면 문항 번호 표시."""
     badge = company_badge(item["company"])
     cat = item.get("category", "")
+    num_label = f"**Q{number}.** &nbsp; " if number is not None else ""
     st.markdown(
-        f"{badge} &nbsp; <span style='color:#888;font-size:0.8rem;'>{cat}"
+        f"{num_label}{badge} &nbsp; <span style='color:#888;font-size:0.8rem;'>{cat}"
         + (f" · {item['tag']}" if item.get("tag") else "")
         + "</span>",
         unsafe_allow_html=True,
     )
-    st.markdown(f"**Q. {item['question']}**")
+    st.markdown(f"**{item['question']}**")
     if show_answer:
         render_answer(item["answer"])
         if item.get("link"):
@@ -165,7 +166,7 @@ if mode == "📚 회사별 정리":
     st.caption(f"{len(filtered)}개 질문")
     st.divider()
 
-    for item in filtered:
+    for idx, item in enumerate(filtered, start=1):
         qid = item["id"]
         left, right = st.columns([1, 1])
 
@@ -174,12 +175,13 @@ if mode == "📚 회사별 정리":
             badge = company_badge(item["company"])
             cat = item.get("category", "")
             st.markdown(
-                f"{badge} &nbsp; <span style='color:#888;font-size:0.8rem;'>{cat}"
+                f"**Q{idx}.** &nbsp; {badge} &nbsp; "
+                f"<span style='color:#888;font-size:0.8rem;'>{cat}"
                 + (f" · {item['tag']}" if item.get("tag") else "")
                 + "</span>",
                 unsafe_allow_html=True,
             )
-            st.markdown(f"**Q. {item['question']}**")
+            st.markdown(f"**{item['question']}**")
             with st.expander("💡 모범답변 보기"):
                 render_answer(item["answer"])
                 if item.get("link"):
@@ -247,9 +249,9 @@ elif mode == "🧠 암기 모드":
         pool = [d for d in pool if d["id"] not in st.session_state.memorized]
 
     st.caption("질문을 보고 답을 떠올린 뒤, 펼쳐서 확인하세요.")
-    for item in pool:
+    for idx, item in enumerate(pool, start=1):
         is_done = item["id"] in st.session_state.memorized
-        question_card(item, show_answer=False)
+        question_card(item, show_answer=False, number=idx)
         checked = st.checkbox(
             "✅ 암기 완료", value=is_done, key=f"memo_{item['id']}"
         )
