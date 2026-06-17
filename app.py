@@ -9,8 +9,10 @@ Q&A 암기 & 랜덤 연습 앱
 모바일 브라우저에서도 그대로 사용 가능.
 """
 
+import html
 import json
 import random
+import re
 from pathlib import Path
 
 import streamlit as st
@@ -29,6 +31,54 @@ st.set_page_config(
 def load_data(_mtime: float):
     # _mtime(파일 수정 시각)이 바뀌면 캐시가 자동 무효화되어 최신 데이터를 읽는다.
     return json.loads(DATA_PATH.read_text(encoding="utf-8"))
+
+
+# 답변에서 자동으로 강조할 핵심 키워드 (기술 스택·지표·역할 등)
+# 새 키워드를 추가하고 싶으면 이 목록에 넣으면 됨.
+HIGHLIGHT_KEYWORDS = [
+    # 언어/도구
+    "Python", "파이썬", "SQL", "Airflow", "BigQuery", "GCS", "Pandas", "pandas",
+    "MySQL", "MariaDB", "PostgreSQL", "Looker Studio", "루커 스튜디오", "태블로",
+    "Tableau", "Gemini", "Claude", "React",
+    # 지표/분석
+    "MRR", "MAU", "DAU", "LTV", "ROAS", "CVR", "코호트", "퍼널", "전환율",
+    "해지율", "잔존율", "재학습", "Z-스코어", "F1-Score", "Chi-square",
+    "T-검정", "카이제곱", "A/B 테스트", "BEP",
+    # 개념/역할
+    "데이터 정합성", "데이터 추출", "데이터 마트", "파이프라인", "KPI",
+    "PO", "PO 역할", "피처 엔지니어링", "코호트 분석", "퍼널 분석",
+    "데이터 품질", "전처리", "노이즈", "user_id",
+]
+
+# 긴 키워드부터 매칭(부분 중복 방지)
+_HL_SORTED = sorted(set(HIGHLIGHT_KEYWORDS), key=len, reverse=True)
+_HL_PATTERN = re.compile("|".join(re.escape(k) for k in _HL_SORTED))
+
+
+def highlight(text: str) -> str:
+    """텍스트를 HTML로 변환하며 핵심 키워드를 볼드+색상으로 강조한다."""
+    escaped = html.escape(text)
+
+    def repl(m):
+        return (
+            "<span style='color:#1d4ed8;font-weight:700;"
+            "background:#eff6ff;padding:0 2px;border-radius:3px;'>"
+            f"{m.group(0)}</span>"
+        )
+
+    highlighted = _HL_PATTERN.sub(repl, escaped)
+    # 줄바꿈 유지
+    return highlighted.replace("\n", "<br>")
+
+
+def render_answer(text: str):
+    """모범답변을 연한 박스 + 키워드 강조로 렌더링."""
+    st.markdown(
+        "<div style='background:#f0fdf4;border-left:4px solid #22c55e;"
+        "padding:12px 14px;border-radius:6px;line-height:1.7;'>"
+        f"{highlight(text)}</div>",
+        unsafe_allow_html=True,
+    )
 
 
 def company_badge(company: str) -> str:
@@ -56,12 +106,12 @@ def question_card(item, show_answer: bool):
     )
     st.markdown(f"**Q. {item['question']}**")
     if show_answer:
-        st.success(item["answer"])
+        render_answer(item["answer"])
         if item.get("link"):
             st.info("🔗 " + item["link"])
     else:
         with st.expander("💡 모범답변 보기"):
-            st.success(item["answer"])
+            render_answer(item["answer"])
             if item.get("link"):
                 st.info("🔗 " + item["link"])
 
