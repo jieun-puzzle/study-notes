@@ -22,7 +22,7 @@ DATA_PATH = Path(__file__).resolve().parent / "questions.json"
 st.set_page_config(
     page_title="Study Notes",
     page_icon="📒",
-    layout="centered",  # 모바일 친화적
+    layout="wide",
     initial_sidebar_state="collapsed",
 )
 
@@ -72,9 +72,9 @@ def highlight(text: str) -> str:
 
 
 def render_answer(text: str):
-    """모범답변을 연한 박스 + 키워드 강조로 렌더링."""
+    """모범답변을 옅은 회색 테두리 박스 + 키워드 강조로 렌더링 (배경색 없음)."""
     st.markdown(
-        "<div style='background:#f0fdf4;border-left:4px solid #22c55e;"
+        "<div style='border:1px solid #e5e7eb;background:transparent;"
         "padding:12px 14px;border-radius:6px;line-height:1.7;'>"
         f"{highlight(text)}</div>",
         unsafe_allow_html=True,
@@ -152,10 +152,49 @@ if mode == "📚 회사별 정리":
             if k in d["question"].lower() or k in d["answer"].lower()
         ]
 
+    # 내가 작성한 답변 저장소 (질문 id -> 텍스트)
+    if "my_answers" not in st.session_state:
+        st.session_state.my_answers = {}
+
     st.caption(f"{len(filtered)}개 질문")
+    st.divider()
+
     for item in filtered:
-        question_card(item, show_answer=False)
-        st.write("")
+        qid = item["id"]
+        left, right = st.columns([1, 1])
+
+        # --- 왼쪽: 질문 + 모범답변 ---
+        with left:
+            badge = company_badge(item["company"])
+            cat = item.get("category", "")
+            st.markdown(
+                f"{badge} &nbsp; <span style='color:#888;font-size:0.8rem;'>{cat}"
+                + (f" · {item['tag']}" if item.get("tag") else "")
+                + "</span>",
+                unsafe_allow_html=True,
+            )
+            st.markdown(f"**Q. {item['question']}**")
+            with st.expander("💡 모범답변 보기"):
+                render_answer(item["answer"])
+                if item.get("link"):
+                    st.info("🔗 " + item["link"])
+
+        # --- 오른쪽: 내 답변 작성 ---
+        with right:
+            st.markdown("**✍️ 내 답변**")
+            draft = st.text_area(
+                "내 답변 작성",
+                value=st.session_state.my_answers.get(str(qid), ""),
+                key=f"draft_{qid}",
+                height=160,
+                label_visibility="collapsed",
+                placeholder="여기에 내 답변을 작성해보세요…",
+            )
+            if st.button("💾 저장하기", key=f"save_{qid}"):
+                st.session_state.my_answers[str(qid)] = draft
+                st.success("저장되었습니다.")
+
+        st.divider()
 
 # ================================================================ 2. 암기 모드
 elif mode == "🧠 암기 모드":
