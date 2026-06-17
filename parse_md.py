@@ -29,6 +29,28 @@ SOURCE_FILES = [
     # ("면접준비_프로젝트3_올라핀테크.md", "올라핀테크", "프로젝트 3"),
 ]
 
+# 1차 면접 우선순위: 제목 맨 앞 번호(예: "6.1", "3") -> 우선순위 라벨
+# essential = ⭐ 1차 필수 / important = 🔸 자주 나옴 / (그 외는 라벨 없음)
+PRIORITY_BY_NUM = {
+    # ⭐ 1차 필수
+    "1": "essential", "2": "essential", "3": "essential", "3.1": "essential",
+    "4": "essential", "6.1": "essential", "6.1.1": "essential",
+    "9": "essential", "11": "essential", "19": "essential", "23": "essential",
+    # 🔸 자주 나옴
+    "3.2": "important", "5": "important", "6": "important", "7": "important",
+    "8": "important", "10": "important", "12": "important",
+    "15": "important", "16": "important", "28": "important",
+}
+PRIORITY_LABEL = {"essential": "⭐ 1차 필수", "important": "🔸 자주 나옴"}
+
+
+def priority_for(title: str) -> str:
+    """제목 앞 번호로 우선순위 라벨을 정한다. 없으면 ''(빈 문자열)."""
+    m = re.match(r"(\d+(?:\.\d+)*)\.", title)
+    if not m:
+        return ""
+    return PRIORITY_BY_NUM.get(m.group(1), "")
+
 # 개인정보 보호: 아래 키워드가 제목/질문에 들어간 항목은
 # 질문은 그대로 두되 답변(실제 수치·주소·가족 등)을 마스킹한다.
 SENSITIVE_KEYWORDS = [
@@ -253,6 +275,7 @@ def main():
             c["company"] = company
             c["category"] = category
             c["source"] = fname
+            c["priority"] = priority_for(c.get("title", ""))
             # 민감 항목: 질문은 유지(구체 정보는 가림), 답변/연결포인트는 마스킹
             if is_sensitive(c.get("title", ""), c.get("question", "")):
                 c["question"] = redact_question(c.get("question", ""))

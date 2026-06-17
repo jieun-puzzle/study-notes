@@ -7,7 +7,8 @@
     "id": 1,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "essential"
   },
   {
     "title": "2. 본인의 단점",
@@ -17,7 +18,8 @@
     "id": 2,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "essential"
   },
   {
     "title": "3. 오래 재직한 이유",
@@ -27,7 +29,8 @@
     "id": 3,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "essential"
   },
   {
     "title": "3.1. 이직 결심 계기",
@@ -37,7 +40,8 @@
     "id": 4,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "essential"
   },
   {
     "title": "3.2. 이직 고민 시작 시점",
@@ -47,7 +51,8 @@
     "id": 5,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "important"
   },
   {
     "title": "4. 인턴과 정규직의 업무 변화",
@@ -57,7 +62,8 @@
     "id": 6,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "essential"
   },
   {
     "title": "5. 데이콘의 서비스 및 데이터 사업 구조",
@@ -67,7 +73,8 @@
     "id": 7,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "important"
   },
   {
     "title": "6. 교육 파트 매니저의 구체적 업무",
@@ -77,7 +84,8 @@
     "id": 8,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "important"
   },
   {
     "title": "6.1. 데이터 추출",
@@ -87,7 +95,8 @@
     "id": 9,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "essential"
   },
   {
     "title": "(추가 질문)",
@@ -97,7 +106,8 @@
     "id": 10,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": ""
   },
   {
     "title": "6.1.1. 콘텐츠별 데이터 추출 항목",
@@ -107,7 +117,8 @@
     "id": 11,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "essential"
   },
   {
     "title": "7. 대시보드 구축 도구 선택 이유",
@@ -117,7 +128,8 @@
     "id": 12,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "important"
   },
   {
     "title": "8. 루커 스튜디오 vs 태블로 차이점",
@@ -127,7 +139,8 @@
     "id": 13,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "important"
   },
   {
     "title": "9. KPI 정의 vs 데이터 추출",
@@ -137,7 +150,8 @@
     "id": 14,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "essential"
   },
   {
     "title": "10. 데이터 분석 결과 공유 방식",
@@ -147,7 +161,8 @@
     "id": 15,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "important"
   },
   {
     "title": "11. 프로젝트 4번: 학습 일탈 구간 식별 및 콘텐츠 개선",
@@ -157,7 +172,8 @@
     "id": 16,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "essential"
   },
   {
     "title": "12. 데이터 추출, 가공, 해석 업무 비중",
@@ -167,7 +183,8 @@
     "id": 17,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "important"
   },
   {
     "title": "13.1. 데이터 누락 체크 및 데이터 품질 관리",
@@ -177,7 +194,8 @@
     "id": 18,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": ""
   },
   {
     "title": "15. 데이터 분석가 진로 선택",
@@ -187,7 +205,8 @@
     "id": 19,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "important"
   },
   {
     "title": "16. 장기적 목표",
@@ -197,7 +216,8 @@
     "id": 20,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "important"
   },
   {
     "title": "17. 발표 자신감",
@@ -207,7 +227,8 @@
     "id": 21,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": ""
   },
   {
     "title": "18. 학교 성적 및 공부 습관",
@@ -217,7 +238,8 @@
     "id": 22,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": ""
   },
   {
     "title": "19. SQL, Python 수준 자가평가",
@@ -227,7 +249,8 @@
     "id": 23,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "essential"
   },
   {
     "title": "20. 이전 업무의 반복성 및 다양성",
@@ -237,7 +260,8 @@
     "id": 24,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": ""
   },
   {
     "title": "21. 프로젝트 진행 방식",
@@ -247,7 +271,8 @@
     "id": 25,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": ""
   },
   {
     "title": "22. 장기 프로젝트 기간",
@@ -257,7 +282,8 @@
     "id": 26,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": ""
   },
   {
     "title": "23. 데이터 분석에서 성과의 정의",
@@ -267,7 +293,8 @@
     "id": 27,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "essential"
   },
   {
     "title": "26. 성격: 내향형 vs 외향형",
@@ -277,7 +304,8 @@
     "id": 28,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": ""
   },
   {
     "title": "27. 휴식 시간 활동 및 취미",
@@ -287,7 +315,8 @@
     "id": 29,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": ""
   },
   {
     "title": "28. 회사에서의 발표 경험",
@@ -297,7 +326,8 @@
     "id": 30,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": "important"
   },
   {
     "title": "29. 대시보드 배포 후 수정 사항",
@@ -307,7 +337,8 @@
     "id": 31,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": ""
   },
   {
     "title": "30. 엑셀리언트 팀 규모 및 주요 업무",
@@ -317,7 +348,8 @@
     "id": 32,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": ""
   },
   {
     "title": "31. 현재 연봉 및 희망 연봉",
@@ -327,7 +359,8 @@
     "id": 33,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": ""
   },
   {
     "title": "32. 출근 가능 일자",
@@ -337,7 +370,8 @@
     "id": 34,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": ""
   },
   {
     "title": "33. 거주지 및 통근 정보",
@@ -347,7 +381,8 @@
     "id": 35,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": ""
   },
   {
     "title": "6.2. 데이터 과학 전공",
@@ -357,6 +392,7 @@
     "id": 36,
     "company": "엑셀리언트",
     "category": "실제 면접 기록",
-    "source": "6_18.md"
+    "source": "6_18.md",
+    "priority": ""
   }
 ]

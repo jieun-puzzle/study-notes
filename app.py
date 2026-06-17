@@ -90,6 +90,21 @@ def render_answer(text: str):
     )
 
 
+def priority_badge(priority: str) -> str:
+    """우선순위 뱃지 HTML. 없으면 빈 문자열."""
+    styles = {
+        "essential": ("⭐ 1차 필수", "#dc2626"),
+        "important": ("🔸 자주 나옴", "#d97706"),
+    }
+    if priority not in styles:
+        return ""
+    label, color = styles[priority]
+    return (
+        f"<span style='background:{color};color:white;padding:2px 10px;"
+        f"border-radius:12px;font-size:0.8rem;font-weight:700;'>{label}</span> "
+    )
+
+
 def company_badge(company: str) -> str:
     colors = {
         "엑셀리언트": "#2563eb",
@@ -106,10 +121,11 @@ def company_badge(company: str) -> str:
 def question_card(item, show_answer: bool, number=None):
     """질문 1개 표시. show_answer=False면 답변을 접어둔다. number가 있으면 보조 번호 표시."""
     badge = company_badge(item["company"])
+    prio = priority_badge(item.get("priority", ""))
     cat = item.get("category", "")
     title = item.get("title", "")
     st.markdown(
-        f"{badge} &nbsp; <span style='color:#888;font-size:0.8rem;'>{cat}"
+        f"{prio}{badge} &nbsp; <span style='color:#888;font-size:0.8rem;'>{cat}"
         + (f" · {item['tag']}" if item.get("tag") else "")
         + "</span>",
         unsafe_allow_html=True,
@@ -181,6 +197,10 @@ if mode == "📚 회사별 정리":
             if k in d["question"].lower() or k in d["answer"].lower()
         ]
 
+    only_essential = st.checkbox("⭐ 1차 필수 질문만 보기")
+    if only_essential:
+        filtered = [d for d in filtered if d.get("priority") == "essential"]
+
     st.caption(f"{len(filtered)}개 질문")
     st.divider()
 
@@ -191,10 +211,11 @@ if mode == "📚 회사별 정리":
         # --- 왼쪽: 질문 + 모범답변 ---
         with left:
             badge = company_badge(item["company"])
+            prio = priority_badge(item.get("priority", ""))
             cat = item.get("category", "")
             title = item.get("title", "")
             st.markdown(
-                f"{badge} &nbsp; "
+                f"{prio}{badge} &nbsp; "
                 f"<span style='color:#888;font-size:0.8rem;'>{cat}"
                 + (f" · {item['tag']}" if item.get("tag") else "")
                 + "</span>",
