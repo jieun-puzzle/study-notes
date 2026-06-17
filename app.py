@@ -101,17 +101,19 @@ def company_badge(company: str) -> str:
 
 
 def question_card(item, show_answer: bool, number=None):
-    """질문 1개 표시. show_answer=False면 답변을 접어둔다. number가 있으면 문항 번호 표시."""
+    """질문 1개 표시. show_answer=False면 답변을 접어둔다. number가 있으면 보조 번호 표시."""
     badge = company_badge(item["company"])
     cat = item.get("category", "")
-    num_label = f"**Q{number}.** &nbsp; " if number is not None else ""
+    title = item.get("title", "")
     st.markdown(
-        f"{num_label}{badge} &nbsp; <span style='color:#888;font-size:0.8rem;'>{cat}"
+        f"{badge} &nbsp; <span style='color:#888;font-size:0.8rem;'>{cat}"
         + (f" · {item['tag']}" if item.get("tag") else "")
         + "</span>",
         unsafe_allow_html=True,
     )
-    st.markdown(f"**{item['question']}**")
+    if title:
+        st.markdown(f"**🔹 {title}**")
+    st.markdown(item["question"])
     if show_answer:
         render_answer(item["answer"])
         if item.get("link"):
@@ -174,14 +176,18 @@ if mode == "📚 회사별 정리":
         with left:
             badge = company_badge(item["company"])
             cat = item.get("category", "")
+            title = item.get("title", "")
             st.markdown(
-                f"**Q{idx}.** &nbsp; {badge} &nbsp; "
+                f"{badge} &nbsp; "
                 f"<span style='color:#888;font-size:0.8rem;'>{cat}"
                 + (f" · {item['tag']}" if item.get("tag") else "")
                 + "</span>",
                 unsafe_allow_html=True,
             )
-            st.markdown(f"**{item['question']}**")
+            # 제목에 번호(6., 6.1. 등)나 (추가 질문) 구분이 들어있으면 함께 표시
+            if title:
+                st.markdown(f"**🔹 {title}**")
+            st.markdown(item["question"])
             with st.expander("💡 모범답변 보기"):
                 render_answer(item["answer"])
                 if item.get("link"):

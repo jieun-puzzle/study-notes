@@ -72,6 +72,26 @@ def clean(text: str) -> str:
     return text.strip()
 
 
+def _extract_qa(block: str):
+    """블록에서 Q/A 텍스트를 뽑아 (질문, 답변) 반환."""
+    q_parts = re.findall(r"\*\*Q[^*]*\*\*\s*:?\s*(.+?)(?=\n\n|\n\*\*A|\Z)", block, re.S)
+    a_parts = re.findall(r"\*\*A[^*]*\*\*\s*:?\s*(.+?)(?=\n\n---|\n## |\n### |\n\*\*Q|\Z)", block, re.S)
+    question = clean(" ".join(q_parts)) if q_parts else ""
+    answer = "\n\n".join(clean(a) for a in a_parts).strip() if a_parts else ""
+    return question, answer
+
+
+def _clean_title(header: str) -> str:
+    title = re.sub(r"\*\*\([^)]*\)\*\*", "", header)
+    title = re.sub(r"`\[[^\]]*\]`", "", title)
+    return clean(title)
+
+
+def _extract_tag(header: str) -> str:
+    m = re.search(r"\((임원[^)]*|기술[^)]*|[^)]*면접관[^)]*|[^)]*성향[^)]*|Q&A[^)]*)\)", header)
+    return m.group(1) if m else ""
+
+
 def parse_interview_format(text: str):
     """
     실제 면접 기록 포맷:
@@ -79,6 +99,7 @@ def parse_interview_format(text: str):
         **Q (홍지호)**: ...
         **A (송지은)**: ...
     섹션(##) 단위로 끊고, 그 안의 Q/A 를 한 카드로 묶는다.
+    단, `### 6-1` 같은 하위 섹션과 `(추가 질문)`은 별도 카드로 분리한다.
     """
     cards = []
     # ## 로 시작하는 블록 단위로 분리
@@ -88,36 +109,75 @@ def parse_interview_format(text: str):
         if not header_match:
             continue
         header = header_match.group(1)
-        # 태그(임원/기술 등) 추출
-        tag_match = re.search(r"\((임원[^)]*|기술[^)]*|[^)]*면접관[^)]*|[^)]*성향[^)]*|Q&A[^)]*)\)", header)
-        tag = tag_match.group(1) if tag_match else ""
-        # 헤더에서 제목만 (강조/태그/타임코드 제거)
-        title = re.sub(r"\*\*\([^)]*\)\*\*", "", header)
-        title = re.sub(r"`\[[^\]]*\]`", "", title)
-        title = clean(title)
+        tag = _extract_tag(header)
+        title = _clean_title(header)
 
         # 종합/마치며 같은 비 Q&A 섹션은 스킵
         if not re.match(r"Q\d", title) and "Q" not in header[:4]:
-            # 질문 마커가 없는 섹션은 건너뜀
             if "**Q" not in block:
                 continue
 
-        # Q / A 추출 (여러 Q가 한 블록에 있을 수 있음 -> 묶어서 본문으로)
-        q_parts = re.findall(r"\*\*Q[^*]*\*\*\s*:?\s*(.+?)(?=\n\n|\n\*\*A|\Z)", block, re.S)
-        a_parts = re.findall(r"\*\*A[^*]*\*\*\s*:?\s*(.+?)(?=\n\n---|\n## |\n\*\*Q|\Z)", block, re.S)
+        # --- 하위 섹션(### 6-1 등)이 있으면 ## 본문과 ### 들을 분리 ---
+        sub_blocks = re.split(r"\n(?=### )", block)
+        # 첫 조각은 ## 본문(상위 질문), 나머지는 ### 하위 섹션
+        top_block = sub_blocks[0]
+        sub_sections = sub_blocks[1:]
 
-        question = clean(" ".join(q_parts)) if q_parts else ""
-        answer = "\n\n".join(clean(a) for a in a_parts).strip() if a_parts else ""
+        # 상위(##) 카드: "Q6. 제목 6-1-1 ..." 의 6 -> "6." 번호로
+        top_num = re.match(r"Q(\d+(?:-\d+)*)", title)
+        top_label = top_num.group(1).replace("-", ".") if top_num else ""
+        top_title = re.sub(r"^Q[\d\-]+\.\s*", "", title)
+        top_title = f"{top_label}. {top_title}" if top_label else top_title
 
-        if not question and not answer:
-            continue
+        # 상위 블록에서 (추가 질문)이 있으면 별도로 떼어낸다
+        addq_split = re.split(r"\n(?=\*\*\(추가\s*질문\))", top_block)
+        main_block = addq_split[0]
+        add_blocks = addq_split[1:]
 
-        cards.append({
-            "title": title,
-            "tag": tag,
-            "question": question,
-            "answer": answer,
-        })
+        q, a = _extract_qa(main_block)
+        if q or a:
+            cards.append({"title": top_title, "tag": tag, "question": q, "answer": a})
+
+        # (추가 질문) 카드 — 번호 없이
+        for ab in add_blocks:
+            m = re.match(r"\*\*\(추가\s*질문\)\s*(.+?)\*\*", ab)
+            aq_question = clean(m.group(1)) if m else "(추가 질문)"
+            # 질문 줄 이후 본문 전체를 답변으로
+            aq_answer = clean(re.sub(r"^\*\*\(추가\s*질문\).*?\*\*", "", ab, count=1, flags=re.S))
+            cards.append({
+                "title": "(추가 질문)", "tag": tag,
+                "question": aq_question, "answer": aq_answer,
+            })
+
+        # 하위(### 6-1, 6-1-1) 카드들
+        for sub in sub_sections:
+            sub_h = re.match(r"###\s+(.+)", sub)
+            if not sub_h:
+                continue
+            sub_header = sub_h.group(1)
+            sub_tag = _extract_tag(sub_header)
+            sub_title = _clean_title(sub_header)
+            # "6-1. 데이터 추출" -> "6.1. 데이터 추출"
+            snum = re.match(r"(\d+(?:-\d+)*)\.", sub_title)
+            if snum:
+                dotted = snum.group(1).replace("-", ".")
+                rest = re.sub(r"^\d+(?:-\d+)*\.\s*", "", sub_title)
+                sub_title = f"{dotted}. {rest}"
+
+            # 이 하위 섹션 안에 또 (추가 질문)이 있을 수 있음
+            sub_addq = re.split(r"\n(?=\*\*\(추가\s*질문\))", sub)
+            sub_main = sub_addq[0]
+            sq, sa = _extract_qa(sub_main)
+            if sq or sa:
+                cards.append({"title": sub_title, "tag": sub_tag, "question": sq, "answer": sa})
+            for ab in sub_addq[1:]:
+                m = re.match(r"\*\*\(추가\s*질문\)\s*(.+?)\*\*", ab)
+                aq_question = clean(m.group(1)) if m else "(추가 질문)"
+                aq_answer = clean(re.sub(r"^\*\*\(추가\s*질문\).*?\*\*", "", ab, count=1, flags=re.S))
+                cards.append({
+                    "title": "(추가 질문)", "tag": sub_tag,
+                    "question": aq_question, "answer": aq_answer,
+                })
     return cards
 
 
