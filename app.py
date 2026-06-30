@@ -32,6 +32,47 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+# ---------------------------------------------------------------- 전역 스타일
+st.markdown(
+    """
+    <style>
+      /* 본문 폭 살짝 여유 + 상단 여백 줄이기 */
+      .block-container { padding-top: 2rem; padding-bottom: 3rem; max-width: 1100px; }
+
+      /* expander(회사정보/STAR/모범답변) 부드러운 카드 느낌 */
+      div[data-testid="stExpander"] {
+          border: 1px solid #e5e7eb;
+          border-radius: 10px;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      }
+
+      /* 라디오(모드 선택) 버튼을 알약 형태로 */
+      div[role="radiogroup"] { gap: 8px; }
+      div[role="radiogroup"] label {
+          background: #f8fafc;
+          border: 1px solid #e5e7eb;
+          border-radius: 20px;
+          padding: 6px 16px;
+          transition: all .15s;
+      }
+      div[role="radiogroup"] label:hover { border-color: #93c5fd; background: #eff6ff; }
+
+      /* 입력창/텍스트영역 라운드 */
+      textarea, input[type="text"] { border-radius: 8px !important; }
+
+      /* 버튼 라운드 + 살짝 강조 */
+      .stButton button {
+          border-radius: 8px;
+          font-weight: 600;
+      }
+
+      /* 구분선 여백 축소 */
+      hr { margin: 0.8rem 0; }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 
 @st.cache_data
 def load_data(_mtime: float):
@@ -148,7 +189,13 @@ def question_card(item, show_answer: bool, number=None):
 data = load_data(DATA_PATH.stat().st_mtime)
 companies = sorted({d["company"] for d in data})
 
-st.caption(f"총 {len(data)}개 항목 · {' / '.join(companies)}")
+st.markdown(
+    "<div style='display:flex;align-items:baseline;gap:10px;'>"
+    "<span style='font-size:1.6rem;font-weight:800;'>📒 Study Notes</span>"
+    f"<span style='color:#94a3b8;font-size:0.85rem;'>총 {len(data)}개 항목 · {' / '.join(companies)}</span>"
+    "</div>",
+    unsafe_allow_html=True,
+)
 
 # ---------------------------------------------------------------- 회사 정보 섹션
 COMPANY_PATH = Path(__file__).resolve().parent / "company_info.json"
