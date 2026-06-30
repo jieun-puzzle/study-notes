@@ -227,6 +227,20 @@ with st.expander("⭐ STAR 기법이란?", expanded=False):
         "💡 실제 면접에서는 'S·T·A·R' 글자를 말하지 말고 **순서대로 자연스럽게** 이야기하세요."
     )
 
+# ---------------------------------------------------------------- 면접 기본 질문 가이드
+GUIDE_PATH = Path(__file__).resolve().parent / "basic_guide.json"
+if GUIDE_PATH.exists():
+    guide = json.loads(GUIDE_PATH.read_text(encoding="utf-8"))
+    with st.expander(f"💬 {guide.get('name', '면접 기본 질문 가이드')}", expanded=False):
+        if guide.get("tip"):
+            st.info("💡 " + guide["tip"])
+        for it in guide.get("items", []):
+            st.markdown(f"**{it['q']}**")
+            if it.get("template"):
+                st.caption("📋 템플릿: " + it["template"])
+            render_answer(it["answer"])
+            st.write("")
+
 mode = st.radio(
     "모드 선택",
     ["📚 회사별 정리", "🧠 암기 모드", "🎲 랜덤 연습"],
