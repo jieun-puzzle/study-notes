@@ -202,17 +202,30 @@ COMPANY_PATH = Path(__file__).resolve().parent / "company_info.json"
 if COMPANY_PATH.exists():
     company = json.loads(COMPANY_PATH.read_text(encoding="utf-8"))
     with st.expander(f"🏢 {company.get('name', '회사 정보')}", expanded=False):
+        if company.get("slogan"):
+            st.markdown(
+                "<div style='border-left:4px solid #2563eb;background:#eff6ff;"
+                "padding:10px 14px;border-radius:6px;font-style:italic;'>"
+                f"“{company['slogan']}”</div>",
+                unsafe_allow_html=True,
+            )
+            st.write("")
         for f in company.get("fields", []):
             val = f["value"]
             if str(val).startswith("http"):
                 val = f"[{val}]({val})"
             st.markdown(f"**{f['label']}** · {val}")
-        if company.get("intro_title"):
-            st.markdown(f"#### {company['intro_title']}")
-            st.markdown(company.get("intro", ""))
-        if company.get("vision_title"):
-            st.markdown(f"#### {company['vision_title']}")
-            st.markdown(company.get("vision", ""))
+        # 본문 블록들 (제목/내용 쌍) — 순서대로 표시
+        for t_key, c_key in [
+            ("intro_title", "intro"),
+            ("vision_title", "vision"),
+            ("requirements_title", "requirements"),
+            ("hard_skills_title", "hard_skills"),
+            ("soft_skills_title", "soft_skills"),
+        ]:
+            if company.get(t_key):
+                st.markdown(f"#### {company[t_key]}")
+                st.markdown(company.get(c_key, ""))
 
 # ---------------------------------------------------------------- STAR 기법 안내
 with st.expander("⭐ STAR 기법이란?", expanded=False):
