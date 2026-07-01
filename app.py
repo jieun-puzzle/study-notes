@@ -122,9 +122,9 @@ def highlight(text: str) -> str:
 
 
 def render_answer(text: str):
-    """모범답변을 옅은 회색 테두리 박스 + 키워드 강조로 렌더링 (배경색 없음)."""
+    """모범답변을 옅은 회색 박스 + 키워드 강조로 렌더링 (다크모드에서도 항상 보이도록 색 고정)."""
     st.markdown(
-        "<div style='border:1px solid #e5e7eb;background:transparent;"
+        "<div style='border:1px solid #e5e7eb;background:#ffffff;color:#111827;"
         "padding:12px 14px;border-radius:6px;line-height:1.7;'>"
         f"{highlight(text)}</div>",
         unsafe_allow_html=True,
@@ -217,7 +217,7 @@ if COMPANY_PATH.exists():
     with st.expander(f"🏢 {company.get('name', '회사 정보')}", expanded=False):
         if company.get("slogan"):
             st.markdown(
-                "<div style='border-left:4px solid #2563eb;background:#eff6ff;"
+                "<div style='border-left:4px solid #2563eb;background:#eff6ff;color:#1e3a5f;"
                 "padding:10px 14px;border-radius:6px;font-style:italic;'>"
                 f"“{company['slogan']}”</div>",
                 unsafe_allow_html=True,
@@ -411,8 +411,8 @@ elif mode == "🗂️ 공통 질문":
         # 면접관이 듣고 싶은 것 — 베이지 박스
         if c.get("want"):
             st.markdown(
-                "<div style='background:#fdf6ec;border-radius:8px;padding:10px 16px;'>"
-                f"<b>면접관이 듣고 싶은 것</b> &nbsp;{c['want']}</div>",
+                "<div style='background:#fdf6ec;color:#7c2d12;border-radius:8px;padding:10px 16px;'>"
+                f"<b>면접관이 듣고 싶은 것</b> &nbsp;{html.escape(c['want'])}</div>",
                 unsafe_allow_html=True,
             )
 
@@ -432,7 +432,7 @@ elif mode == "🗂️ 공통 질문":
         # 예시 답변 — 회색 박스 (원문 그대로, 따옴표 이미 포함)
         if c.get("example"):
             st.markdown(
-                "<div style='background:#f4f4f5;border-radius:8px;padding:12px 16px;line-height:1.7;'>"
+                "<div style='background:#f4f4f5;color:#18181b;border-radius:8px;padding:12px 16px;line-height:1.7;'>"
                 "<b>예시 답변</b><br>"
                 f"<span style='color:#3f3f46;'>{html.escape(c['example'])}</span></div>",
                 unsafe_allow_html=True,
@@ -530,7 +530,7 @@ elif mode == "🎤 말하기 연습":
 
         # 키워드 힌트 (항상 표시)
         st.markdown("##### 🎯 키워드 힌트")
-        hint_html = "<div style='background:#fffbeb;border:1px solid #fde68a;" \
+        hint_html = "<div style='background:#fffbeb;color:#713f12;border:1px solid #fde68a;" \
                     "border-radius:8px;padding:12px 16px;line-height:2;'>"
         for i, line in enumerate(hints[str(item["id"])], 1):
             hint_html += f"<div><b>{i}.</b> {line}</div>"
