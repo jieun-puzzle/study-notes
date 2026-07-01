@@ -196,6 +196,12 @@ if HINTS_PATH.exists():
     hints = {k: v for k, v in json.loads(HINTS_PATH.read_text(encoding="utf-8")).items()
              if not k.startswith("_")}
 
+# 공통 면접 가이드 로드 (핵심 질문 10 · 유형 · 탈락 패턴)
+IGUIDE_PATH = Path(__file__).resolve().parent / "interview_guide.json"
+iguide = {}
+if IGUIDE_PATH.exists():
+    iguide = json.loads(IGUIDE_PATH.read_text(encoding="utf-8"))
+
 st.markdown(
     "<div style='display:flex;align-items:baseline;gap:10px;'>"
     "<span style='font-size:1.6rem;font-weight:800;'>📒 Study Notes</span>"
@@ -370,41 +376,51 @@ if mode == "📚 엑셀리언트":
 
         st.divider()
 
-# ================================================================ 1-2. 주제별 보기
+# ================================================================ 1-2. 공통 질문
 elif mode == "🗂️ 공통 질문":
-    TOPIC_ORDER = [
-        "나에 대한 질문", "기술·프로젝트", "일하는 방식", "커뮤니케이션",
-        "면접 마무리", "프로젝트 1", "프로젝트 2", "프로젝트 3",
-    ]
-    present = {d.get("topic", "") for d in data}
-    topics = [t for t in TOPIC_ORDER if t in present] + \
-             sorted(present - set(TOPIC_ORDER) - {""})
+    core = iguide.get("core_questions", [])
+    if iguide.get("intro"):
+        st.info("💡 " + iguide["intro"])
 
-    sel_topic = st.selectbox("주제 선택", topics)
-    filtered = [d for d in data if d.get("topic") == sel_topic]
+    # 5개 유형 필터
+    TYPE_ORDER = ["이력서 기반", "인성", "지원 회사", "직무", "회사 생활"]
+    sel_type = st.radio(
+        "질문 유형",
+        ["전체"] + TYPE_ORDER,
+        horizontal=True,
+    )
+    shown = core if sel_type == "전체" else [c for c in core if c.get("type") == sel_type]
 
-    keyword = st.text_input("🔍 검색", placeholder="예: KPI, SQL, 코호트", key="topic_kw")
-    if keyword:
-        k = keyword.lower()
-        filtered = [d for d in filtered
-                    if k in d["question"].lower() or k in d["answer"].lower()]
-
-    st.caption(f"『{sel_topic}』 {len(filtered)}개 질문")
+    st.caption(f"{len(shown)}개 질문")
     st.divider()
 
-    for item in filtered:
-        prio = priority_badge(item.get("priority", ""))
-        badge = company_badge(item["company"])
-        title = item.get("title", "")
-        st.markdown(f"{prio}{badge}", unsafe_allow_html=True)
-        if title:
-            st.markdown(f"**🔹 {title}**")
-        st.markdown(f"**Q. {item['question']}**")
-        with st.expander("💡 모범답변 보기"):
-            render_answer(item["answer"])
-            if item.get("link"):
-                st.info("🔗 " + item["link"])
-        st.write("")
+    # 핵심 질문 카드
+    for c in shown:
+        st.markdown(
+            f"<span style='background:#e0e7ff;color:#3730a3;padding:2px 10px;"
+            f"border-radius:12px;font-size:0.75rem;'>{c.get('type','')}</span>",
+            unsafe_allow_html=True,
+        )
+        st.markdown(f"**{c['q']}**")
+        if c.get("want"):
+            st.caption(f"🎯 면접관 의도: {c['want']}")
+        if c.get("point"):
+            st.markdown(f"**📌 답변 포인트** — {c['point']}")
+        with st.expander("💬 예시 답변 보기"):
+            render_answer(c.get("example", ""))
+        st.divider()
+
+    # 질문 유형 설명 + 탈락 패턴 (전체 볼 때만)
+    if sel_type == "전체":
+        with st.expander("📂 면접 질문 5가지 유형이란?"):
+            for t in iguide.get("types", []):
+                st.markdown(f"**{t['t']}** — {t['desc']}")
+                st.caption("예: " + t.get("ex", ""))
+        with st.expander("⚠️ 탈락 답변 패턴 5가지 (피하기!)"):
+            for f in iguide.get("fail_patterns", []):
+                st.markdown(f"- ❌ **{f['p']}** → ✅ {f['fix']}")
+        if iguide.get("outro"):
+            st.info("🎤 " + iguide["outro"])
 
 # ================================================================ 3. 랜덤 연습
 elif mode == "🎲 랜덤 연습":
