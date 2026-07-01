@@ -394,20 +394,50 @@ elif mode == "🗂️ 공통 질문":
     st.caption(f"{len(shown)}개 질문")
     st.divider()
 
-    # 핵심 질문 카드
+    # 핵심 질문 카드 (깔끔한 박스 스타일)
     for ci, c in enumerate(shown):
+        # 질문 번호(Q1) + 질문 본문 분리
+        qparts = c["q"].split(". ", 1)
+        qnum = qparts[0] if len(qparts) == 2 else ""
+        qtext = qparts[1] if len(qparts) == 2 else c["q"]
+
         st.markdown(
-            f"<span style='background:#e0e7ff;color:#3730a3;padding:2px 10px;"
-            f"border-radius:12px;font-size:0.75rem;'>{c.get('type','')}</span>",
+            f"<span style='background:#374151;color:white;padding:3px 12px;"
+            f"border-radius:14px;font-size:0.8rem;font-weight:700;'>{qnum}</span>",
             unsafe_allow_html=True,
         )
-        st.markdown(f"**{c['q']}**")
+        st.markdown(f"### {qtext}")
+
+        # 면접관이 듣고 싶은 것 — 베이지 박스
         if c.get("want"):
-            st.caption(f"🎯 면접관 의도: {c['want']}")
+            st.markdown(
+                "<div style='background:#fdf6ec;border-radius:8px;padding:10px 16px;'>"
+                f"<b>면접관이 듣고 싶은 것</b> &nbsp;{c['want']}</div>",
+                unsafe_allow_html=True,
+            )
+
+        # 답변 포인트 — 초록 세로선 + 불릿
         if c.get("point"):
-            st.markdown(f"**📌 답변 포인트** — {c['point']}")
-        with st.expander("💬 예시 답변 보기"):
-            render_answer(c.get("example", ""))
+            bullets = "".join(
+                f"<li>{p.strip()}</li>"
+                for p in re.split(r"\s*·\s*", c["point"]) if p.strip()
+            )
+            st.markdown(
+                "<div style='border-left:4px solid #22c55e;padding:2px 0 2px 14px;margin:14px 0 6px;'>"
+                "<b>📌 답변 포인트</b></div>"
+                f"<ul style='margin-top:0;color:#374151;'>{bullets}</ul>",
+                unsafe_allow_html=True,
+            )
+
+        # 예시 답변 — 회색 박스
+        if c.get("example"):
+            st.markdown(
+                "<div style='background:#f4f4f5;border-radius:8px;padding:12px 16px;line-height:1.7;'>"
+                "<b>예시 답변</b><br>"
+                f"<span style='color:#3f3f46;'>\"{html.escape(c['example'])}\"</span></div>",
+                unsafe_allow_html=True,
+            )
+
         # 내 답변 직접 작성 빈칸
         st.text_area(
             "✍️ 내 답변 작성",
