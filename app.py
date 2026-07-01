@@ -267,7 +267,7 @@ if GUIDE_PATH.exists():
 
 mode = st.radio(
     "모드 선택",
-    ["📚 회사별 정리", "🧠 암기 모드", "🎲 랜덤 연습", "🎤 말하기 연습"],
+    ["📚 회사별 정리", "🗂️ 주제별 보기", "🧠 암기 모드", "🎲 랜덤 연습", "🎤 말하기 연습"],
     horizontal=True,
     label_visibility="collapsed",
 )
@@ -281,18 +281,11 @@ if mode == "📚 회사별 정리":
         sel_company = st.selectbox("회사", ["전체"] + companies)
     filtered = [d for d in data if sel_company == "전체" or d["company"] == sel_company]
 
-    # 주제(topic) 필터 — 자료에 있는 주제를 정해진 순서로 노출
-    TOPIC_ORDER = [
-        "나에 대한 질문", "기술·프로젝트", "일하는 방식", "커뮤니케이션",
-        "면접 마무리", "프로젝트 1", "프로젝트 2", "프로젝트 3",
-    ]
-    present = {d.get("topic", "") for d in filtered}
-    topics = [t for t in TOPIC_ORDER if t in present] + \
-             sorted(present - set(TOPIC_ORDER) - {""})
+    cats = sorted({d["category"] for d in filtered})
     with col2:
-        sel_topic = st.selectbox("주제", ["전체"] + topics)
-    if sel_topic != "전체":
-        filtered = [d for d in filtered if d.get("topic") == sel_topic]
+        sel_cat = st.selectbox("카테고리", ["전체"] + cats)
+    if sel_cat != "전체":
+        filtered = [d for d in filtered if d["category"] == sel_cat]
 
     keyword = st.text_input("🔍 검색 (질문·답변 내 키워드)", placeholder="예: KPI, SQL, 이탈")
     if keyword:
@@ -317,9 +310,9 @@ if mode == "📚 회사별 정리":
         with left:
             badge = company_badge(item["company"])
             prio = priority_badge(item.get("priority", ""))
-            topic = item.get("topic", "")
+            cat = item.get("category", "")
             title = item.get("title", "")
-            meta = topic
+            meta = cat
             if item.get("tag"):
                 meta += f" · {item['tag']}"
             st.markdown(
@@ -376,6 +369,42 @@ if mode == "📚 회사별 정리":
                 st.caption("⚠️ 녹음 기능을 쓰려면 streamlit-mic-recorder 설치가 필요합니다.")
 
         st.divider()
+
+# ================================================================ 1-2. 주제별 보기
+elif mode == "🗂️ 주제별 보기":
+    TOPIC_ORDER = [
+        "나에 대한 질문", "기술·프로젝트", "일하는 방식", "커뮤니케이션",
+        "면접 마무리", "프로젝트 1", "프로젝트 2", "프로젝트 3",
+    ]
+    present = {d.get("topic", "") for d in data}
+    topics = [t for t in TOPIC_ORDER if t in present] + \
+             sorted(present - set(TOPIC_ORDER) - {""})
+
+    sel_topic = st.selectbox("주제 선택", topics)
+    filtered = [d for d in data if d.get("topic") == sel_topic]
+
+    keyword = st.text_input("🔍 검색", placeholder="예: KPI, SQL, 코호트", key="topic_kw")
+    if keyword:
+        k = keyword.lower()
+        filtered = [d for d in filtered
+                    if k in d["question"].lower() or k in d["answer"].lower()]
+
+    st.caption(f"『{sel_topic}』 {len(filtered)}개 질문")
+    st.divider()
+
+    for item in filtered:
+        prio = priority_badge(item.get("priority", ""))
+        badge = company_badge(item["company"])
+        title = item.get("title", "")
+        st.markdown(f"{prio}{badge}", unsafe_allow_html=True)
+        if title:
+            st.markdown(f"**🔹 {title}**")
+        st.markdown(f"**Q. {item['question']}**")
+        with st.expander("💡 모범답변 보기"):
+            render_answer(item["answer"])
+            if item.get("link"):
+                st.info("🔗 " + item["link"])
+        st.write("")
 
 # ================================================================ 2. 암기 모드
 elif mode == "🧠 암기 모드":
