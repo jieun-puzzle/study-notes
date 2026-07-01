@@ -226,6 +226,10 @@ if COMPANY_PATH.exists():
             if company.get(t_key):
                 st.markdown(f"#### {company[t_key]}")
                 st.markdown(company.get(c_key, ""))
+        # 지원동기 — 키워드 하이라이트 적용
+        if company.get("motivation_title"):
+            st.markdown(f"#### {company['motivation_title']}")
+            render_answer(company.get("motivation", ""))
 
 # ---------------------------------------------------------------- STAR 기법 안내
 with st.expander("⭐ STAR 기법이란?", expanded=False):
