@@ -267,7 +267,7 @@ if GUIDE_PATH.exists():
 
 mode = st.radio(
     "모드 선택",
-    ["📚 회사별 정리", "🗂️ 주제별 보기", "🧠 암기 모드", "🎲 랜덤 연습", "🎤 말하기 연습"],
+    ["📚 엑셀리언트", "🗂️ 공통 질문", "🎲 랜덤 연습", "🎤 말하기 연습"],
     horizontal=True,
     label_visibility="collapsed",
 )
@@ -275,7 +275,7 @@ mode = st.radio(
 st.divider()
 
 # ================================================================ 1. 회사별 정리
-if mode == "📚 회사별 정리":
+if mode == "📚 엑셀리언트":
     col1, col2 = st.columns(2)
     with col1:
         sel_company = st.selectbox("회사", ["전체"] + companies)
@@ -371,7 +371,7 @@ if mode == "📚 회사별 정리":
         st.divider()
 
 # ================================================================ 1-2. 주제별 보기
-elif mode == "🗂️ 주제별 보기":
+elif mode == "🗂️ 공통 질문":
     TOPIC_ORDER = [
         "나에 대한 질문", "기술·프로젝트", "일하는 방식", "커뮤니케이션",
         "면접 마무리", "프로젝트 1", "프로젝트 2", "프로젝트 3",
@@ -404,36 +404,6 @@ elif mode == "🗂️ 주제별 보기":
             render_answer(item["answer"])
             if item.get("link"):
                 st.info("🔗 " + item["link"])
-        st.write("")
-
-# ================================================================ 2. 암기 모드
-elif mode == "🧠 암기 모드":
-    # 회사 필터
-    sel_company = st.selectbox("회사", ["전체"] + companies, key="memo_company")
-    pool = [d for d in data if sel_company == "전체" or d["company"] == sel_company]
-
-    if "memorized" not in st.session_state:
-        st.session_state.memorized = set()
-
-    done = len([d for d in pool if d["id"] in st.session_state.memorized])
-    st.progress(done / len(pool) if pool else 0,
-                text=f"암기 완료: {done} / {len(pool)}")
-
-    hide_memorized = st.checkbox("암기 완료한 질문 숨기기")
-    if hide_memorized:
-        pool = [d for d in pool if d["id"] not in st.session_state.memorized]
-
-    st.caption("질문을 보고 답을 떠올린 뒤, 펼쳐서 확인하세요.")
-    for idx, item in enumerate(pool, start=1):
-        is_done = item["id"] in st.session_state.memorized
-        question_card(item, show_answer=False, number=idx)
-        checked = st.checkbox(
-            "✅ 암기 완료", value=is_done, key=f"memo_{item['id']}"
-        )
-        if checked:
-            st.session_state.memorized.add(item["id"])
-        else:
-            st.session_state.memorized.discard(item["id"])
         st.write("")
 
 # ================================================================ 3. 랜덤 연습
