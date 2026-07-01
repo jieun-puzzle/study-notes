@@ -395,7 +395,7 @@ elif mode == "🗂️ 공통 질문":
     st.divider()
 
     # 핵심 질문 카드
-    for c in shown:
+    for ci, c in enumerate(shown):
         st.markdown(
             f"<span style='background:#e0e7ff;color:#3730a3;padding:2px 10px;"
             f"border-radius:12px;font-size:0.75rem;'>{c.get('type','')}</span>",
@@ -408,6 +408,13 @@ elif mode == "🗂️ 공통 질문":
             st.markdown(f"**📌 답변 포인트** — {c['point']}")
         with st.expander("💬 예시 답변 보기"):
             render_answer(c.get("example", ""))
+        # 내 답변 직접 작성 빈칸
+        st.text_area(
+            "✍️ 내 답변 작성",
+            key=f"coreq_{c['q'][:6]}",
+            height=110,
+            placeholder="위 포인트·예시를 참고해 내 답변을 작성해보세요…",
+        )
         st.divider()
 
     # 유형별 예시 질문(빈칸으로 직접 답변 작성) — 특정 유형 선택 시
