@@ -189,6 +189,13 @@ def question_card(item, show_answer: bool, number=None):
 data = load_data(DATA_PATH.stat().st_mtime)
 companies = sorted({d["company"] for d in data})
 
+# 키워드 힌트(논리 뼈대) 로드 — id(문자열) -> [힌트 줄들]
+HINTS_PATH = Path(__file__).resolve().parent / "hints.json"
+hints = {}
+if HINTS_PATH.exists():
+    hints = {k: v for k, v in json.loads(HINTS_PATH.read_text(encoding="utf-8")).items()
+             if not k.startswith("_")}
+
 st.markdown(
     "<div style='display:flex;align-items:baseline;gap:10px;'>"
     "<span style='font-size:1.6rem;font-weight:800;'>📒 Study Notes</span>"
@@ -260,7 +267,7 @@ if GUIDE_PATH.exists():
 
 mode = st.radio(
     "모드 선택",
-    ["📚 회사별 정리", "🧠 암기 모드", "🎲 랜덤 연습"],
+    ["📚 회사별 정리", "🧠 암기 모드", "🎲 랜덤 연습", "🎤 말하기 연습"],
     horizontal=True,
     label_visibility="collapsed",
 )
@@ -424,6 +431,57 @@ elif mode == "🎲 랜덤 연습":
             st.caption("질문을 소리 내어 답해본 뒤 '답변 보기'를 누르세요.")
     else:
         st.warning("질문이 없습니다.")
+
+# ================================================================ 4. 말하기 연습
+elif mode == "🎤 말하기 연습":
+    st.caption("💡 통암기 대신 **키워드 힌트(뼈대)**만 보고 소리 내어 말해보세요. "
+               "막히면 다음 힌트로 넘어가면 됩니다.")
+
+    # 힌트가 있는 질문만 대상으로 (연습 효과 큰 핵심 답변)
+    hinted = [d for d in data if str(d["id"]) in hints]
+    if not hinted:
+        st.warning("아직 키워드 힌트가 준비된 질문이 없습니다.")
+    else:
+        titles = [f"{d['title']}" for d in hinted]
+        sel = st.selectbox("연습할 질문", titles, key="speak_sel")
+        item = hinted[titles.index(sel)]
+
+        st.divider()
+        # 질문
+        prio = priority_badge(item.get("priority", ""))
+        st.markdown(f"{prio}**🔹 {item['title']}**", unsafe_allow_html=True)
+        st.markdown(f"**Q. {item['question']}**")
+
+        # 키워드 힌트 (항상 표시)
+        st.markdown("##### 🎯 키워드 힌트")
+        hint_html = "<div style='background:#fffbeb;border:1px solid #fde68a;" \
+                    "border-radius:8px;padding:12px 16px;line-height:2;'>"
+        for i, line in enumerate(hints[str(item["id"])], 1):
+            hint_html += f"<div><b>{i}.</b> {line}</div>"
+        hint_html += "</div>"
+        st.markdown(hint_html, unsafe_allow_html=True)
+
+        # 음성 녹음 (실전처럼 말해보고 들어보기)
+        st.markdown("##### 🎙️ 녹음해서 들어보기")
+        if "speak_rec" not in st.session_state:
+            st.session_state.speak_rec = {}
+        rid = str(item["id"])
+        if _MIC_AVAILABLE:
+            rec = mic_recorder(
+                start_prompt="🎤 녹음 시작", stop_prompt="⏹️ 녹음 중지",
+                just_once=False, use_container_width=True,
+                format="webm", key=f"speakmic_{rid}",
+            )
+            if rec and rec.get("bytes"):
+                st.session_state.speak_rec[rid] = rec["bytes"]
+            if st.session_state.speak_rec.get(rid):
+                st.audio(st.session_state.speak_rec[rid], format="audio/webm")
+        else:
+            st.caption("⚠️ 녹음 기능은 streamlit-mic-recorder 설치 시 사용 가능합니다.")
+
+        # 전체 답변 (접기) — 말한 뒤 비교용
+        with st.expander("✅ 전체 모범답변 보기 (말한 뒤 비교)"):
+            render_answer(item["answer"])
 
 st.divider()
 st.caption("자료 수정: .md 편집 후 parse_md.py 재실행")
