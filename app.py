@@ -410,6 +410,22 @@ elif mode == "🗂️ 공통 질문":
             render_answer(c.get("example", ""))
         st.divider()
 
+    # 유형별 예시 질문(빈칸으로 직접 답변 작성) — 특정 유형 선택 시
+    tq = iguide.get("type_questions", {})
+    if sel_type != "전체" and sel_type in tq:
+        st.markdown(f"#### ✍️ 『{sel_type}』 유형 예상 질문 — 직접 답변 작성")
+        st.caption("아래 질문에 내 답변을 직접 채워보세요. (입력 내용은 세션 동안 유지)")
+        for i, q in enumerate(tq[sel_type], 1):
+            st.markdown(f"**{i}. {q}**")
+            st.text_area(
+                "내 답변",
+                key=f"typeq_{sel_type}_{i}",
+                height=100,
+                label_visibility="collapsed",
+                placeholder="여기에 내 답변을 작성해보세요…",
+            )
+            st.divider()
+
     # 질문 유형 설명 + 탈락 패턴 (전체 볼 때만)
     if sel_type == "전체":
         with st.expander("📂 면접 질문 5가지 유형이란?"):
