@@ -416,11 +416,11 @@ elif mode == "🗂️ 공통 질문":
                 unsafe_allow_html=True,
             )
 
-        # 답변 포인트 — 초록 세로선 + 불릿
+        # 답변 포인트 — 초록 세로선 + 불릿 (줄바꿈 기준으로 분리, 원문 그대로)
         if c.get("point"):
             bullets = "".join(
-                f"<li>{p.strip()}</li>"
-                for p in re.split(r"\s*·\s*", c["point"]) if p.strip()
+                f"<li>{html.escape(p.strip())}</li>"
+                for p in c["point"].split("\n") if p.strip()
             )
             st.markdown(
                 "<div style='border-left:4px solid #22c55e;padding:2px 0 2px 14px;margin:14px 0 6px;'>"
@@ -429,12 +429,12 @@ elif mode == "🗂️ 공통 질문":
                 unsafe_allow_html=True,
             )
 
-        # 예시 답변 — 회색 박스
+        # 예시 답변 — 회색 박스 (원문 그대로, 따옴표 이미 포함)
         if c.get("example"):
             st.markdown(
                 "<div style='background:#f4f4f5;border-radius:8px;padding:12px 16px;line-height:1.7;'>"
                 "<b>예시 답변</b><br>"
-                f"<span style='color:#3f3f46;'>\"{html.escape(c['example'])}\"</span></div>",
+                f"<span style='color:#3f3f46;'>{html.escape(c['example'])}</span></div>",
                 unsafe_allow_html=True,
             )
 
