@@ -281,11 +281,18 @@ if mode == "📚 회사별 정리":
         sel_company = st.selectbox("회사", ["전체"] + companies)
     filtered = [d for d in data if sel_company == "전체" or d["company"] == sel_company]
 
-    cats = sorted({d["category"] for d in filtered})
+    # 주제(topic) 필터 — 자료에 있는 주제를 정해진 순서로 노출
+    TOPIC_ORDER = [
+        "나에 대한 질문", "기술·프로젝트", "일하는 방식", "커뮤니케이션",
+        "면접 마무리", "프로젝트 1", "프로젝트 2", "프로젝트 3",
+    ]
+    present = {d.get("topic", "") for d in filtered}
+    topics = [t for t in TOPIC_ORDER if t in present] + \
+             sorted(present - set(TOPIC_ORDER) - {""})
     with col2:
-        sel_cat = st.selectbox("카테고리", ["전체"] + cats)
-    if sel_cat != "전체":
-        filtered = [d for d in filtered if d["category"] == sel_cat]
+        sel_topic = st.selectbox("주제", ["전체"] + topics)
+    if sel_topic != "전체":
+        filtered = [d for d in filtered if d.get("topic") == sel_topic]
 
     keyword = st.text_input("🔍 검색 (질문·답변 내 키워드)", placeholder="예: KPI, SQL, 이탈")
     if keyword:
@@ -310,13 +317,14 @@ if mode == "📚 회사별 정리":
         with left:
             badge = company_badge(item["company"])
             prio = priority_badge(item.get("priority", ""))
-            cat = item.get("category", "")
+            topic = item.get("topic", "")
             title = item.get("title", "")
+            meta = topic
+            if item.get("tag"):
+                meta += f" · {item['tag']}"
             st.markdown(
                 f"{prio}{badge} &nbsp; "
-                f"<span style='color:#888;font-size:0.8rem;'>{cat}"
-                + (f" · {item['tag']}" if item.get("tag") else "")
-                + "</span>",
+                f"<span style='color:#888;font-size:0.8rem;'>{meta}</span>",
                 unsafe_allow_html=True,
             )
             # 제목에 번호(6., 6.1. 등)나 (추가 질문) 구분이 들어있으면 함께 표시
